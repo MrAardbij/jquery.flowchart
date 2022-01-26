@@ -94,7 +94,7 @@
 
 			//Construct de flowchart
 			$flowchart.flowchart({
-				data: defaultFlowchartData,
+				//data: defaultFlowchartData,
 				defaultSelectedLinkColor: '#000055',
 				grid: 10,
 				multipleLinksOnInput: false,
@@ -176,9 +176,7 @@
 
 			//tijdelijke debug
 			$('#debug').click(function() {
-				console.log($flowchart.flowchart('getOperatorData',0).properties.inputs);
-				console.log($flowchart.flowchart('getOperatorData',0).properties.outputs);
-				$flowchart.flowchart('setConnectorName',0,'input_0', 'ik ben nieuwe text!');
+				$flowchart.flowchart('setInputConnectorName',0,'input_0', 'ik ben nieuwe text!');
 			});
 
 			//keyup event van de input operator title

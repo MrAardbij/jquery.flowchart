@@ -353,9 +353,26 @@ jQuery(function ($) {
             return {x: x, width: width, y: y};
         },
 
-        //zet de naam van de connector van een label
-        setConnectorName: function (operatorId, connectorId, newText) {
-            console.log(this.data.operators[operatorId].internal.els.connectorArrows[connectorId][0].parent().find('.flowchart-operator-connector-label').text(newText));
+        //zet het label van eem input connector
+        setInputConnectorName: function (operatorId, connectorId, newText) {
+          if (typeof this.data.operators[operatorId].properties == 'undefined') {
+              alert('Opertator bestaat niet!');
+              return;
+          }
+          this.data.operators[operatorId].internal.els.connectorArrows[connectorId][0].parent().find('.flowchart-operator-connector-label').text(newText);
+          this.data.operators[operatorId].properties.inputs[connectorId].label = newText;
+          this._refreshInternalProperties(this.data.operators[operatorId]);
+        },
+
+        //zet het label van eem output connector
+        setOutputConnectorName: function (operatorId, connectorId, newText) {
+          if (typeof this.data.operators[operatorId].properties == 'undefined') {
+              alert('Opertator bestaat niet!');
+              return;
+          }
+          this.data.operators[operatorId].internal.els.connectorArrows[connectorId][0].parent().find('.flowchart-operator-connector-label').text(newText);
+          this.data.operators[operatorId].properties.outputs[connectorId].label = newText;
+          this._refreshInternalProperties(this.data.operators[operatorId]);
         },
 
         getLinkMainColor: function (linkId) {
