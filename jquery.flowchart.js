@@ -14,55 +14,77 @@ jQuery(function ($) {
     $.widget("flowchart.flowchart", {
         // default options
         options: {
-            canUserEditLinks: true,
-            canUserMoveOperators: true,
-            data: {},
+            canUserEditLinks: true, //kan de gebruiker connectors aanpassen
+            canUserMoveOperators: true, //kan de gebruiker operators aanpassen
+            data: {}, //de data
             distanceFromArrow: 3,
             defaultOperatorClass: 'flowchart-default-operator',
-            defaultLinkColor: '#3366ff',
-            defaultSelectedLinkColor: 'black',
+            defaultLinkColor: '#3366ff', //kleur van de connectors
+            defaultSelectedLinkColor: 'black', //kleur van de connectors als ze in de selected state zitten
             linkWidth: 10,
-            grid: 20,
-            multipleLinksOnOutput: false,
-            multipleLinksOnInput: false,
+            grid: 20, //draggable grid
+            multipleLinksOnOutput: false, //mogen er meerdere connectors op dezelfde output worden aangesloten
+            multipleLinksOnInput: false, //mogen er meerdere connectors op dezelfde input worden aangesloten
             linkVerticalDecal: 0,
-            verticalConnection: false,
+            verticalConnection: false, //als dit op false staat worden de connectors horizontaal getoont, anders verticaal
+
+            //De change state events
+
+            //als een operator de selected state krijgt
             onOperatorSelect: function (operatorId) {
                 return true;
             },
+
+            //als een operator de selected state verlaat
             onOperatorUnselect: function () {
                 return true;
             },
+
+            //als er een mouse over event plaats vind op een operator
             onOperatorMouseOver: function (operatorId) {
                 return true;
             },
+
+            //als er een mouse out event plaats vind op een operator
             onOperatorMouseOut: function (operatorId) {
                 return true;
             },
+
+            //als een connector de selected state krijgt
             onLinkSelect: function (linkId) {
                 return true;
             },
+
+            //als een operator de selected state verlaat
             onLinkUnselect: function () {
                 return true;
             },
+
+            //als er een operator wordt aangemaakt
             onOperatorCreate: function (operatorId, operatorData, fullElement) {
                 return true;
             },
+
+            //als er connector wordt aangemaakt
             onLinkCreate: function (linkId, linkData) {
                 return true;
             },
+
+            //als er een operator wordt verwijderd
             onOperatorDelete: function (operatorId) {
                 return true;
             },
+
+            //als er een connector wordt verwijderd
             onLinkDelete: function (linkId, forced) {
                 return true;
             },
-            onOperatorMoved: function (operatorId, position) {
 
-            },
-            onAfterChange: function (changeType) {
+            //als er een operator wordt verplaatst
+            onOperatorMoved: function (operatorId, position) {},
 
-            }
+            //deze wordt afgeroepen nadat een event klaar is met uitvoeren
+            onAfterChange: function (changeType) {}
         },
         data: null,
         objs: null,
