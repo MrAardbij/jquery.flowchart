@@ -29,48 +29,70 @@
 <body>
 	<h1>Semi-minimalist usage sample</h1>
 	<h4>Sample created with basis on some from Sebastien Drouyer, original author's <a href="https://sebastien.drouyer.com/jquery.flowchart-demo/">website</a>.</h4>
-	<h4>Flowchart</h4>
-	<div id="chart_container">
+  <h4>Flowchart</h4>
+
+	<!-- Dit is de main container workspace -->
+	<div>
 		<div class="flowchart-example-container" id="flowchartworkspace"></div>
 	</div>
-	<div class="draggable_operators">
-		<div class="draggable_operators_label">
-			Operators (drag and drop them in the flowchart):
+
+	<!-- De operators -->
+	<div> <!-- Holder -->
+
+		<div class="draggable_operator_label">
+			Operators (drag and drop them in the flowchart): <!-- Label -->
 		</div>
-		<div class="draggable_operators_divs">
+
+		<div class="draggable_operator_container"> <!-- Container -->
+
 			<div class="draggable_operator" data-nb-inputs="1" data-nb-outputs="0">1 input</div>
 			<div class="draggable_operator" data-nb-inputs="0" data-nb-outputs="1">1 output</div>
 			<div class="draggable_operator" data-nb-inputs="1" data-nb-outputs="1">1 input &amp; 1 output</div>
 			<div class="draggable_operator" data-nb-inputs="1" data-nb-outputs="2">1 in &amp; 2 out</div>
 			<div class="draggable_operator" data-nb-inputs="2" data-nb-outputs="1">2 in &amp; 1 out</div>
 			<div class="draggable_operator" data-nb-inputs="2" data-nb-outputs="2">2 in &amp; 2 out</div>
-		</div>
+
+		</div> <!-- Container End-->
+
+	</div> <!-- Holder End -->
+
+
+	<button id="create_operator">Create operator</button> <!-- Bouw een operator op basis van een JS script ipv draggable -->
+	<button id="delete_item">Delete selected operator / link</button> <!-- Voer een delete selected event uit -->
+
+	<div id="operator_properties" style="display: block;"> <!-- Operator opties -->
+		<label for="operator_title">Operator's title: </label><input id="operator_title" type="text"> <!-- De title van de operator -->
 	</div>
-	<button class="create_operator">Create operator</button>
-	<button class="delete_selected_button">Delete selected operator / link</button>
-	<div id="operator_properties" style="display: block;">
-		<label for="operator_title">Operator's title: </label><input id="operator_title" type="text">
+
+	<div id="link_properties" style="display: block;"> <!-- Connector opties -->
+		<label for="link_color">Link's color: </label><input id="link_color" type="color"> <!-- De unselected kleur van de operator -->
 	</div>
-	<div id="link_properties" style="display: block;">
-		<label for="link_color">Link's color: </label><input id="link_color" type="color">
-	</div>
-	<button class="get_data" id="get_data">Get data</button>
-	<button class="set_data" id="set_data">Set data</button>
+
+	<button class="get_data" id="get_data">Get data</button> <!-- Plaats JSON data in textarea -->
+	<button class="set_data" id="set_data">Set data</button> <!-- Parse JSON in textarea en probeer deze in  -->
+
+	<!--
 	<button id="save_local">Save to local storage</button>
 	<button id="load_local">Load from local storage</button>
+-->
+
 	<div>
-		<textarea id="flowchart_data"></textarea>
+		<textarea id="flowchart_data"></textarea> <!-- De textarea waar de JSON in wordt gezet na export data -->
 	</div>
+
+
 	<br><br>
-	<button type="button" id="debug">debug</button>
+	<button type="button" id="debug">debug</button> <!-- tijdelijke debug -->
+
 	<script type="text/javascript">
-		/* global $ */
 		$(document).ready(function() {
-			var $flowchart = $('#flowchartworkspace');
+			var $flowchart = $('#flowchartworkspace'); //init de workspace
+
+			//zet de container van de workspace, deze wordt gebruikt bij het draggen van de draggable operators
 			var $container = $flowchart.parent();
 
 
-			// Apply the plugin on a standard, empty div...
+			//Construct de flowchart
 			$flowchart.flowchart({
 				data: defaultFlowchartData,
 				defaultSelectedLinkColor: '#000055',
@@ -79,17 +101,22 @@
 				multipleLinksOnOutput: false
 			});
 
+			//haal operator data uit de draggable divs
+			//@param $element Het te gebruiken element
+			//moet minimaal data-nb-inputs="x" en data-nb-outputs="x" bevatten
+			//waat x het aantal in en outputs is
 			function getOperatorData($element) {
-				var nbInputs = parseInt($element.data('nb-inputs'), 10);
-				var nbOutputs = parseInt($element.data('nb-outputs'), 10);
+				var nbInputs = parseInt($element.data('nb-inputs'), 10); //haal het nummer met inputs op
+				var nbOutputs = parseInt($element.data('nb-outputs'), 10); //haal het nummer met outputs op
 				var data = {
 					properties: {
-						title: $element.text(),
+						title: $element.text(), //zet de title gelijk aan de text van het element
 						inputs: {},
 						outputs: {}
 					}
 				};
 
+				//zet de input en outputs en registreer deze in data.properties.inputs
 				var i = 0;
 				for (i = 0; i < nbInputs; i++) {
 					data.properties.inputs['input_' + i] = {
@@ -102,62 +129,74 @@
 					};
 				}
 
-				return data;
+				return data; //return
 			}
-
-
 
 			//-----------------------------------------
 			//--- operator and link properties
 			//--- start
-			var $operatorProperties = $('#operator_properties');
-			$operatorProperties.hide();
-			var $linkProperties = $('#link_properties');
-			$linkProperties.hide();
-			var $operatorTitle = $('#operator_title');
-			var $linkColor = $('#link_color');
 
+			//de operator properties div
+			var $operatorProperties = $('#operator_properties');
+			$operatorProperties.hide(); //hide deze
+
+			var $operatorTitle = $('#operator_title'); //de operator title
+
+			//de connector properties div
+			var $linkProperties = $('#link_properties');
+			$linkProperties.hide(); //hide deze
+
+			var $linkColor = $('#link_color'); //de kleur van de unselected connector
+
+			//override de handlers
 			$flowchart.flowchart({
+
 				onOperatorSelect: function(operatorId) {
-					$operatorProperties.show();
-					$operatorTitle.val($flowchart.flowchart('getOperatorTitle', operatorId));
-					console.log(operatorId);
-					return true;
+					$operatorProperties.show(); //show de operator properties div
+					$operatorTitle.val($flowchart.flowchart('getOperatorTitle', operatorId)); //zet de value van de title naar de operator title
+					return true; //return
 				},
+
 				onOperatorUnselect: function() {
-					$operatorProperties.hide();
-					return true;
+					$operatorProperties.hide(); //hide de properties div
+					return true; //return
 				},
+
 				onLinkSelect: function(linkId) {
-					$linkProperties.show();
-					$linkColor.val($flowchart.flowchart('getLinkMainColor', linkId));
-					return true;
+					$linkProperties.show(); //show de link properties div
+					$linkColor.val($flowchart.flowchart('getLinkMainColor', linkId)); //zet de value van de color naar de value van de unselected connector
+					return true; //return
 				},
+
 				onLinkUnselect: function() {
-					$linkProperties.hide();
-					return true;
+					$linkProperties.hide(); //hide de properties
+					return true; //return
 				}
 			});
 
+			//tijdelijke debug
 			$('#debug').click(function() {
 				console.log($flowchart.flowchart('getOperatorData',0).properties.inputs);
 				console.log($flowchart.flowchart('getOperatorData',0).properties.outputs);
 				$flowchart.flowchart('setConnectorName',0,'input_0', 'ik ben nieuwe text!');
 			});
 
+			//keyup event van de input operator title
 			$operatorTitle.keyup(function() {
-				var selectedOperatorId = $flowchart.flowchart('getSelectedOperatorId');
-				if (selectedOperatorId != null) {
-					$flowchart.flowchart('setOperatorTitle', selectedOperatorId, $operatorTitle.val());
+				var selectedOperatorId = $flowchart.flowchart('getSelectedOperatorId'); //haal de operator id op
+				if (selectedOperatorId != null) { //als deze niet null is
+					$flowchart.flowchart('setOperatorTitle', selectedOperatorId, $operatorTitle.val()); //zet de title van de operator
 				}
 			});
 
+			//change event van de color input voor unselected connector color
 			$linkColor.change(function() {
-				var selectedLinkId = $flowchart.flowchart('getSelectedLinkId');
-				if (selectedLinkId != null) {
-					$flowchart.flowchart('setLinkMainColor', selectedLinkId, $linkColor.val());
+				var selectedLinkId = $flowchart.flowchart('getSelectedLinkId'); //haal de connector id op
+				if (selectedLinkId != null) { //als deze niet null is
+					$flowchart.flowchart('setLinkMainColor', selectedLinkId, $linkColor.val()); //zet de nieuwe kleur van de connector
 				}
 			});
+
 			//--- end
 			//--- operator and link properties
 			//-----------------------------------------
@@ -165,9 +204,12 @@
 			//-----------------------------------------
 			//--- delete operator / link button
 			//--- start
-			$flowchart.parent().siblings('.delete_selected_button').click(function() {
+
+			//verwijder geselecteerd element
+			$('#delete_item').click(function() {
 				$flowchart.flowchart('deleteSelected');
 			});
+
 			//--- end
 			//--- delete operator / link button
 			//-----------------------------------------
@@ -177,8 +219,10 @@
 			//-----------------------------------------
 			//--- create operator button
 			//--- start
+
+			//maak een voorgedefineerde operator aan
 			var operatorI = 0;
-			$flowchart.parent().siblings('.create_operator').click(function() {
+			$('#create_operator').click(function() {
 				var operatorId = 'created_operator_' + operatorI;
 				var operatorData = {
 					top: ($flowchart.height() / 2) - 30,
