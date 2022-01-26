@@ -8,7 +8,7 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 
 	<!-- jQuery & jQuery UI are required -->
-	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 	<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
 
 	<!-- Flowchart CSS and JS -->
@@ -61,6 +61,8 @@
 	<div>
 		<textarea id="flowchart_data"></textarea>
 	</div>
+	<br><br>
+	<button type="button" id="debug">debug</button>
 	<script type="text/javascript">
 		/* global $ */
 		$(document).ready(function() {
@@ -73,10 +75,9 @@
 				data: defaultFlowchartData,
 				defaultSelectedLinkColor: '#000055',
 				grid: 10,
-				multipleLinksOnInput: true,
-				multipleLinksOnOutput: true
+				multipleLinksOnInput: false,
+				multipleLinksOnOutput: false
 			});
-
 
 			function getOperatorData($element) {
 				var nbInputs = parseInt($element.data('nb-inputs'), 10);
@@ -120,6 +121,7 @@
 				onOperatorSelect: function(operatorId) {
 					$operatorProperties.show();
 					$operatorTitle.val($flowchart.flowchart('getOperatorTitle', operatorId));
+					console.log(operatorId);
 					return true;
 				},
 				onOperatorUnselect: function() {
@@ -135,6 +137,12 @@
 					$linkProperties.hide();
 					return true;
 				}
+			});
+
+			$('#debug').click(function() {
+				console.log($flowchart.flowchart('getOperatorData',0).properties.inputs);
+				console.log($flowchart.flowchart('getOperatorData',0).properties.outputs);
+				$flowchart.flowchart('setConnectorName',0,'input_0', 'ik ben nieuwe text!');
 			});
 
 			$operatorTitle.keyup(function() {

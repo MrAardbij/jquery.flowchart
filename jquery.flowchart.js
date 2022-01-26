@@ -331,6 +331,11 @@ jQuery(function ($) {
             return {x: x, width: width, y: y};
         },
 
+        //zet de naam van de connector van een label
+        setConnectorName: function (operatorId, connectorId, newText) {
+            console.log(this.data.operators[operatorId].internal.els.connectorArrows[connectorId][0].parent().find('.flowchart-operator-connector-label').text(newText));
+        },
+
         getLinkMainColor: function (linkId) {
             var color = this.options.defaultLinkColor;
             var linkData = this.data.links[linkId];
@@ -666,7 +671,7 @@ jQuery(function ($) {
             function operatorChangedPosition(operator_id, pos) {
                 operatorData.top = pos.top;
                 operatorData.left = pos.left;
-                
+
                 for (var linkId in self.data.links) {
                     if (self.data.links.hasOwnProperty(linkId)) {
                         var linkData = self.data.links[linkId];
@@ -700,13 +705,13 @@ jQuery(function ($) {
                             var elementOffset = self.element.offset();
                             ui.position.left = Math.round(((e.pageX - elementOffset.left) / self.positionRatio - pointerX) / grid) * grid;
                             ui.position.top = Math.round(((e.pageY - elementOffset.top) / self.positionRatio - pointerY) / grid) * grid;
-                            
+
                             if (!operatorData.internal.properties.uncontained) {
                                 var $this = $(this);
                                 ui.position.left = Math.min(Math.max(ui.position.left, 0), self.element.width() - $this.outerWidth());
                                 ui.position.top = Math.min(Math.max(ui.position.top, 0), self.element.height() - $this.outerHeight());
                             }
-                            
+
                             ui.offset.left = Math.round(ui.position.left + elementOffset.left);
                             ui.offset.top = Math.round(ui.position.top + elementOffset.top);
                             fullElement.operator.css({left: ui.position.left, top: ui.position.top});
@@ -761,7 +766,7 @@ jQuery(function ($) {
                 this._unsetTemporaryLink();
             }
         },
-        
+
         _unsetTemporaryLink: function () {
             this.lastOutputConnectorClicked = null;
             this.objs.layers.temporaryLink.hide();
@@ -806,7 +811,7 @@ jQuery(function ($) {
         _addSelectedClass: function (operatorId) {
             this.data.operators[operatorId].internal.els.operator.addClass('selected');
         },
-        
+
         callbackEvent: function(name, params) {
             var cbName = 'on' + name.charAt(0).toUpperCase() + name.slice(1);
             var ret = this.options[cbName].apply(this, params);
@@ -1119,7 +1124,7 @@ jQuery(function ($) {
                 'height': elOperator.height(),
             };
         },
-        
+
         doesOperatorExists: function (operatorId) {
             return typeof this.data.operators[operatorId] != 'undefined';
         },
