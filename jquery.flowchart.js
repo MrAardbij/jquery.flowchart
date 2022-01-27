@@ -375,6 +375,13 @@ jQuery(function ($) {
           this._refreshInternalProperties(this.data.operators[operatorId]);
         },
 
+        getConnectorNames: function (operatorId){
+          out = [];
+          out.input = this.data.operators[operatorId].properties.inputs;
+          out.output = this.data.operators[operatorId].properties.outputs;
+          return out;
+        },
+
         getLinkMainColor: function (linkId) {
             var color = this.options.defaultLinkColor;
             var linkData = this.data.links[linkId];

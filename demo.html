@@ -62,6 +62,8 @@
 
 	<div id="operator_properties" style="display: block;"> <!-- Operator opties -->
 		<label for="operator_title">Operator's title: </label><input id="operator_title" type="text"> <!-- De title van de operator -->
+		<div id="operator_input" style="display:none;"></div> <!-- Div voor aanpassen connectors input -->
+		<div id="operator_output" style="display:none;"></div> <!-- Div voor aanpassen connectors output -->
 	</div>
 
 	<div id="link_properties" style="display: block;"> <!-- Connector opties -->
@@ -80,17 +82,21 @@
 		<textarea id="flowchart_data"></textarea> <!-- De textarea waar de JSON in wordt gezet na export data -->
 	</div>
 
-
-	<br><br>
-	<button type="button" id="debug">debug</button> <!-- tijdelijke debug -->
-
 	<script type="text/javascript">
+		var $flowchart = $('#flowchartworkspace'); //init de workspace
+
+		function editConnLabel(type, operatorId, connectorId, newValue) {
+			if (type == 'input') {
+				$flowchart.flowchart('setInputConnectorName',operatorId, connectorId, newValue);
+			}else if (type == 'output') {
+				$flowchart.flowchart('setOutputConnectorName',operatorId, connectorId, newValue);
+			}
+		}
+
 		$(document).ready(function() {
-			var $flowchart = $('#flowchartworkspace'); //init de workspace
 
 			//zet de container van de workspace, deze wordt gebruikt bij het draggen van de draggable operators
 			var $container = $flowchart.parent();
-
 
 			//Construct de flowchart
 			$flowchart.flowchart({
@@ -141,6 +147,8 @@
 			$operatorProperties.hide(); //hide deze
 
 			var $operatorTitle = $('#operator_title'); //de operator title
+			var $operatorInputConnectors = $('#operator_input'); //de operator input connectors
+			var $operatorOutputConnectors = $('#operator_output'); //de operator output connectors
 
 			//de connector properties div
 			var $linkProperties = $('#link_properties');
@@ -154,6 +162,36 @@
 				onOperatorSelect: function(operatorId) {
 					$operatorProperties.show(); //show de operator properties div
 					$operatorTitle.val($flowchart.flowchart('getOperatorTitle', operatorId)); //zet de value van de title naar de operator title
+					connectors = $flowchart.flowchart('getConnectorNames', operatorId); //haal de connectors op
+
+					//leeg deze
+					$operatorInputConnectors.html('');
+					$operatorOutputConnectors.html('');
+
+					//als de input connectors zijn gevuld
+					if (Object.keys(connectors.input).length > 0) {
+						$operatorInputConnectors.show(); //toon div
+						for (const [key, value] of Object.entries(connectors.input)) {
+							//maak een input aan voor de labels die worden uitgelezen door de listner op inputconnlabel
+							$operatorInputConnectors.append(`${key}:&nbsp;<input type="text" onkeyup="editConnLabel('input', '${operatorId}', '${key}', this.value);" value="${value.label}" /><br>`);
+						}
+					}else {
+						//anders hide
+						$operatorInputConnectors.hide();
+					}
+
+					//als de output connectors zijn gevuld
+					if (Object.keys(connectors.output).length > 0) {
+						$operatorOutputConnectors.show(); //toon div
+						for (const [key, value] of Object.entries(connectors.output)) {
+							//maak een input aan voor de labels die worden uitgelezen door de listner op outputconnlabel
+							$operatorOutputConnectors.append(`${key}:&nbsp;<input type="text" onkeyup="editConnLabel('output', '${operatorId}', '${key}', this.value);" value="${value.label}" /><br>`);
+						}
+					}else {
+						//anders hide
+						$operatorOutputConnectors.hide();
+					}
+
 					return true; //return
 				},
 
@@ -172,11 +210,6 @@
 					$linkProperties.hide(); //hide de properties
 					return true; //return
 				}
-			});
-
-			//tijdelijke debug
-			$('#debug').click(function() {
-				$flowchart.flowchart('setInputConnectorName',0,'input_0', 'ik ben nieuwe text!');
 			});
 
 			//keyup event van de input operator title
