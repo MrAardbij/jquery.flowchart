@@ -296,19 +296,17 @@
 				cursor: "move",
 				opacity: 0.7,
 
-				// helper: 'clone',
+				//helper: 'clone', //dit returned een clone van het huidige element
 				appendTo: 'body',
 				zIndex: 1000,
 
 				helper: function(e) {
-					var $this = $(this);
-					var data = getOperatorData($this);
-					return $flowchart.flowchart('getOperatorElement', data);
+					return $flowchart.flowchart('getOperatorElement', getOperatorData($(this))); //dit returned een styled operator
 				},
 				stop: function(e, ui) {
-					var $this = $(this);
 					var elOffset = ui.offset;
 					var containerOffset = $container.offset();
+
 					if (elOffset.left > containerOffset.left &&
 						elOffset.top > containerOffset.top &&
 						elOffset.left < containerOffset.left + $container.width() &&
@@ -323,11 +321,11 @@
 						relativeLeft /= positionRatio;
 						relativeTop /= positionRatio;
 
-						var data = getOperatorData($this);
+						var data = getOperatorData($(this));
 						data.left = relativeLeft;
 						data.top = relativeTop;
 
-						$flowchart.flowchart('addOperator', data);
+						$flowchart.flowchart('addOperator', data); //voeg de operator toe aan de canvas
 					}
 				}
 			});
