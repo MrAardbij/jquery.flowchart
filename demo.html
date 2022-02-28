@@ -34,7 +34,7 @@
 	<h4>Flowchart</h4>
 
 	<!-- Dit is de main container workspace -->
-	<div>
+	<div style="width: 850px; height: 450px; max-width: 1000px; max-height: 500px; overflow: scroll; border: 1px solid black;">
 		<div class="flowchart-example-container" id="flowchartworkspace"></div>
 	</div>
 
@@ -75,6 +75,9 @@
 	<button class="get_data" id="get_data">Get data</button> <!-- Plaats JSON data in textarea -->
 	<button class="set_data" id="set_data">Set data</button> <!-- Parse JSON in textarea en probeer deze in  -->
 
+	<input type="range" id="transform_test" min="0.5" max="2" value="1" step="0.1">
+	<button id="size_test">Canvas size increase test</button>
+
 	<!--
 	<button id="save_local">Save to local storage</button>
 	<button id="load_local">Load from local storage</button>
@@ -94,6 +97,16 @@
 				$flowchart.flowchart('setOutputConnectorName',operatorId, connectorId, newValue);
 			}
 		}
+
+		$('#transform_test').change(function() {
+			console.log($(this).val());
+			$('#flowchartworkspace').css('transform', 'scale('+$(this).val()+')');
+		});
+
+		$('#size_test').click(function() {
+			$('#flowchartworkspace').height("+=200");
+			$('#flowchartworkspace').width("+=500");
+		});
 
 		$(document).ready(function() {
 
