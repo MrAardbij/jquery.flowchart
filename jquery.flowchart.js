@@ -704,6 +704,7 @@ jQuery(function ($) {
             fullElement.operator.appendTo(this.objs.layers.operators);
             fullElement.operator.css({top: operatorData.top, left: operatorData.left});
             fullElement.operator.data('operator_id', operatorId);
+            fullElement.operator.data('operator_type', operatorData.actionType);
 
             this.data.operators[operatorId] = operatorData;
             this.data.operators[operatorId].internal.els = fullElement;
