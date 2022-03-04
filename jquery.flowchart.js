@@ -832,7 +832,10 @@ jQuery(function ($) {
                 this._unsetTemporaryLink();
             }
 
-            if ($target.closest('.flowchart-operator').length == 0) {
+            if (
+              $target.closest('.flowchart-operator').length == 0 &&
+              $target.closest('#operatorSettings').length == 0
+            ) {
                 this.unselectOperator();
             }
 
