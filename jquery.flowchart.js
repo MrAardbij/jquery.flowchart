@@ -353,9 +353,105 @@ jQuery(function ($) {
             return {x: x, width: width, y: y};
         },
 
+        setConnectorCount: function (inputConnCnt, outputConnCnt) {
+          let operatorId = this.selectedOperatorId;
+          if (typeof this.data.operators[operatorId] == 'undefined') {
+              alert('Opertator bestaat niet!');
+              return;
+          }
+
+          this.data.operators[operatorId].properties.inputs = {};
+          this.data.operators[operatorId].properties.outputs = {};
+          this.data.operators[operatorId].internal.els.connectorArrows = {};
+
+          $(`div[operator=${operatorId}]`).remove();
+          $(`div[operator=${operatorId}]`).remove();
+
+          inputConnCnt = inputConnCnt++;
+          for (var i = 0; i < inputConnCnt; i++) {
+            this.createConnector(operatorId, 'input_'+i, 'inputs', 'Input '+i);
+          }
+
+          outputConnCnt = outputConnCnt++;
+          for (var i = 0; i < outputConnCnt; i++) {
+            this.createConnector(operatorId, 'output_'+i, 'outputs', 'Output '+i);
+          }
+
+          this._refreshInternalProperties(this.data.operators[operatorId]);
+          this._refreshOperatorConnectors(operatorId);
+
+          console.log(this.data.operators[operatorId].internal.els);
+        },
+
+        createConnector: function (operatorId, connectorId, inoutputs, label) {
+
+          //zet de porperties als deze nog niet bestaan
+          if (typeof this.data.operators[operatorId].properties == 'undefined') {
+            this.data.operators[operatorId].properties = {};
+          }
+
+          if (typeof this.data.operators[operatorId].properties[inoutputs] == 'undefined') {
+            this.data.operators[operatorId].properties[inoutputs] = {};
+          }
+
+          //maak object propertie aan
+          this.data.operators[operatorId].properties[inoutputs][connectorId] = {};
+          this.data.operators[operatorId].properties[inoutputs][connectorId] = {
+            label: connectorId
+          };
+
+          //voor de zekerheid verwijderen
+          $(`div[operator=${operatorId}][connector=${connectorId}]`).remove();
+
+          $NewConnobj = $(`<div class="flowchart-operator-connector-set" operator="${operatorId}" connector="${connectorId}" ></div>`);
+
+          $ConnOperator  = $(`<div class="flowchart-operator-connector"></div>`);
+          $NewConnobj.append($ConnOperator);
+
+          $ConnLabelObj = $(`<div class="flowchart-operator-connector-label">${label}</div>`);
+          $ConnArrowObj = $(`<div class="flowchart-operator-connector-arrow"></div>`);
+          $ConnSmallArrowObj = $(`<div class="flowchart-operator-connector-small-arrow"></div>`);
+
+          $ConnOperator.append($ConnLabelObj);
+          $ConnOperator.append($ConnArrowObj);
+          $ConnOperator.append($ConnSmallArrowObj);
+
+          //voeg html toe aan operator
+          this.data.operators[operatorId].internal.els.operator.find('.flowchart-operator-'+inoutputs).append( $NewConnobj );
+          //maak de objecten aan
+          this.data.operators[operatorId].internal.els.connectors[connectorId] = [];
+          this.data.operators[operatorId].internal.els.connectorArrows[connectorId] = [];
+          this.data.operators[operatorId].internal.els.connectorSmallArrows[connectorId] = [];
+          this.data.operators[operatorId].internal.els.connectorLabel[connectorId] = [];
+
+          //vul de objecten
+          this.data.operators[operatorId].internal.els.connectors[connectorId].push($ConnOperator);
+          this.data.operators[operatorId].internal.els.connectorArrows[connectorId].push($ConnArrowObj);
+          this.data.operators[operatorId].internal.els.connectorSmallArrows[connectorId].push($ConnSmallArrowObj);
+          this.data.operators[operatorId].internal.els.connectorLabel[connectorId].push($ConnLabelObj);
+
+          console.log(this.data.operators[operatorId].internal.els);
+        },
+
+        deleteConnector: function (operatorId, connectorId, inoutputs) {
+
+          //verwijder object propertie
+          delete this.data.operators[operatorId].properties[inoutputs][connectorId];
+
+          //verwijder de html
+          $(`div[operator=${operatorId}][connector=${connectorId}]`).remove();
+
+          //verwijder de objecten
+          delete this.data.operators[operatorId].internal.els.connectors[connectorId];
+          delete this.data.operators[operatorId].internal.els.connectorArrows[connectorId];
+          delete this.data.operators[operatorId].internal.els.connectorSmallArrows[connectorId];
+          delete this.data.operators[operatorId].internal.els.connectorLabel[connectorId];
+
+        },
+
         //zet het label van eem input connector
         setInputConnectorName: function (operatorId, connectorId, newText) {
-          if (typeof this.data.operators[operatorId].properties == 'undefined') {
+          if (typeof this.data.operators[operatorId] == 'undefined') {
               alert('Opertator bestaat niet!');
               return;
           }
@@ -366,7 +462,7 @@ jQuery(function ($) {
 
         //zet het label van eem output connector
         setOutputConnectorName: function (operatorId, connectorId, newText) {
-          if (typeof this.data.operators[operatorId].properties == 'undefined') {
+          if (typeof this.data.operators[operatorId] == 'undefined') {
               alert('Opertator bestaat niet!');
               return;
           }
@@ -598,6 +694,7 @@ jQuery(function ($) {
 
             var connectorArrows = {};
             var connectorSmallArrows = {};
+            var connectorLabel = {};
             var connectorSets = {};
             var connectors = {};
 
@@ -608,7 +705,8 @@ jQuery(function ($) {
                 connectorSets: connectorSets,
                 connectors: connectors,
                 connectorArrows: connectorArrows,
-                connectorSmallArrows: connectorSmallArrows
+                connectorSmallArrows: connectorSmallArrows,
+                connectorLabel: connectorLabel
             };
 
             function addConnector(connectorKey, connectorInfos, $operator_container, connectorType) {
@@ -618,6 +716,7 @@ jQuery(function ($) {
 
                 connectorArrows[connectorKey] = [];
                 connectorSmallArrows[connectorKey] = [];
+                connectorLabel[connectorKey] = [];
                 connectors[connectorKey] = [];
                 connectorSets[connectorKey] = $operator_connector_set;
 
@@ -669,6 +768,7 @@ jQuery(function ($) {
             fullElement.connectors[connectorKey].push($operator_connector);
             fullElement.connectorArrows[connectorKey].push($operator_connector_arrow);
             fullElement.connectorSmallArrows[connectorKey].push($operator_connector_small_arrow);
+            fullElement.connectorLabel[connectorKey].push($operator_connector_label);
         },
 
         getOperatorElement: function (operatorData) {
