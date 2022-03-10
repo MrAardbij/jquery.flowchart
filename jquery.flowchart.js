@@ -379,8 +379,6 @@ jQuery(function ($) {
 
           this._refreshInternalProperties(this.data.operators[operatorId]);
           this._refreshOperatorConnectors(operatorId);
-
-          console.log(this.data.operators[operatorId].internal.els);
         },
 
         createConnector: function (operatorId, connectorId, inoutputs, label) {
@@ -404,8 +402,11 @@ jQuery(function ($) {
           $(`div[operator=${operatorId}][connector=${connectorId}]`).remove();
 
           $NewConnobj = $(`<div class="flowchart-operator-connector-set" operator="${operatorId}" connector="${connectorId}" ></div>`);
+          $NewConnobj.data('connector_type',inoutputs);
 
           $ConnOperator  = $(`<div class="flowchart-operator-connector"></div>`);
+          $ConnOperator.data('connector',connectorId);
+          $ConnOperator.data('sub_connector',0);
           $NewConnobj.append($ConnOperator);
 
           $ConnLabelObj = $(`<div class="flowchart-operator-connector-label">${label}</div>`);
@@ -429,8 +430,6 @@ jQuery(function ($) {
           this.data.operators[operatorId].internal.els.connectorArrows[connectorId].push($ConnArrowObj);
           this.data.operators[operatorId].internal.els.connectorSmallArrows[connectorId].push($ConnSmallArrowObj);
           this.data.operators[operatorId].internal.els.connectorLabel[connectorId].push($ConnLabelObj);
-
-          console.log(this.data.operators[operatorId].internal.els);
         },
 
         deleteConnector: function (operatorId, connectorId, inoutputs) {
