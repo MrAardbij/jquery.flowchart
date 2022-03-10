@@ -377,8 +377,6 @@ jQuery(function ($) {
             this.createConnector(operatorId, 'output_'+i, 'outputs', 'Output '+i);
           }
 
-          this._refreshInternalProperties(this.data.operators[operatorId]);
-          this._refreshOperatorConnectors(operatorId);
         },
 
         createConnector: function (operatorId, connectorId, inoutputs, label) {
@@ -395,7 +393,7 @@ jQuery(function ($) {
           //maak object propertie aan
           this.data.operators[operatorId].properties[inoutputs][connectorId] = {};
           this.data.operators[operatorId].properties[inoutputs][connectorId] = {
-            label: connectorId
+            label: label
           };
 
           //voor de zekerheid verwijderen
@@ -430,6 +428,9 @@ jQuery(function ($) {
           this.data.operators[operatorId].internal.els.connectorArrows[connectorId].push($ConnArrowObj);
           this.data.operators[operatorId].internal.els.connectorSmallArrows[connectorId].push($ConnSmallArrowObj);
           this.data.operators[operatorId].internal.els.connectorLabel[connectorId].push($ConnLabelObj);
+
+          this._refreshInternalProperties(this.data.operators[operatorId]);
+          this._refreshOperatorConnectors(operatorId);
         },
 
         deleteConnector: function (operatorId, connectorId, inoutputs) {
