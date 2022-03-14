@@ -105,7 +105,7 @@
 
 .flowchart-operator {
     position: absolute;
-    width: 140px;
+    min-width: 140px;
     border: 1px solid #CCCCCC;
     background: #FAFAFA;
     pointer-events: auto;
